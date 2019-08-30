@@ -86,15 +86,28 @@ export default class Sidebar extends React.Component {
                     </Grid>
                 </CardContent>
                 <div id="buttonWrapper">
-                    <Button className="submitJson" color="primary" size="small" variant="outlined" onClick={(e) => {
-                        this.props.handleSubmit(e)
-                    }} > Valider </Button>
+                    {this.props.hasValidated && 
+                    <div>
+                        <p>Your changes were saved.</p>
+                        <p>It may take time for the homepage to update due to caching policy.</p>
+                        <p>Please be patient to see your changes reflected.</p>
+                    </div>
+                    }
+                    <Button
+                        className="submitJson"
+                        color="primary"
+                        size="small"
+                        variant="outlined"
+                        onClick={(e) => {
+                            this.props.handleSubmit(e)
+                        }} 
+                    >Submit
+                    </Button>
                     <div id="cancel">
-                        <Button className="reinitJson" color="secondary" size="small" variant="outlined" onClick={(e) => {
-                            this.props.handleCancel(this.props.handleInputLang)
-                        }} > Annuler </Button>
-                        <p id='warningChange'>Des Changements sont en cours</p>
-                    
+                    <Button className="reinitJson" color="secondary" size="small" variant="outlined" onClick={(e) => {
+                        this.props.handleCancel(this.props.handleInputLang)
+                    }} >Cancel</Button>
+                    <p id='warningChange'>Modifications in progress.</p>
                     </div>
                 </div>
             </Card>

@@ -4,11 +4,12 @@ import Sidebar from './sidebar.js';
 import _ from 'lodash';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import { ThemeProvider } from '@material-ui/styles';
 /**
  * Main App, Gestion de la logique des entrées et sorties utilisateurs
  */
 
-class App extends React.Component {
+class FrontPage extends React.Component {
     constructor(props) {
         super(props);
         this.handleChangeInput = this.handleChangeInput.bind(this)
@@ -19,14 +20,11 @@ class App extends React.Component {
         this.handleTargetBlank = this.handleTargetBlank.bind(this)
         this.state = {
             lang: 'fr',
-            static_double_top: [
-                { ...this.props.data.fr.static_double_top[0] },  
-                { ...this.props.data.fr.static_double_top[1] },  
-                { ...this.props.data.fr.static_double_top[2] }  
-            ],
-            single: [...this.props.data.fr.single],
-            double: this.props.data.fr.double,
-            static_double: { ...this.props.data.fr.static_double }
+            static_double_top: [],
+            single: [],
+            double: '',
+            static_double: {},
+            hasValidated: false
         }
     }
     /**
@@ -35,11 +33,12 @@ class App extends React.Component {
      * @param {*Gestion de l'index des tuiles simples} i 
      * @param {*Définition du type (image ou link) pour les champs tuiles doubles} type 
      */
-    handleChangeInput(e, i, type) { 
-        if (i || i === 0) {
+    handleChangeInput(e, i, type) {
+        if (i || i === 0) {
             let temp = this.state.single
             temp[i] = e.target.value;
             this.setState({ single: temp })
+
         } else if (type) {
             let temp = [...e.target.parentNode.parentNode.classList];
             if (temp.includes('tuileDoubleRebondOri')){
@@ -69,40 +68,66 @@ class App extends React.Component {
      * Pour le moment juste un log dans la console
      */
     handleSubmit(){
-        let jsonCode = `
-        {${this.state.lang}:{
-                "static_double_top":[
-                    {
-                        "image": ${this.state.static_double_top[0].image},
-                        "link":  ${this.state.static_double_top[0].link},
-                        "target_blank" : ${this.state.static_double_top.target_blank}
-                    },{
-                        "image": ${this.state.static_double_top[1].image},
-                        "link":  ${this.state.static_double_top[1].link},
-                        "target_blank" : ${this.state.static_double_top.target_blank}
-                    },{
-                        "image": ${this.state.static_double_top[2].image},
-                        "link":  ${this.state.static_double_top[2].link},
-                        "target_blank" : ${this.state.static_double_top.target_blank}
-                    }
-                ],
-                "single" : ${this.state.single},
-                "double" : ${this.state.double},
-                "static_double" : {
-                    "image" : ${this.state.static_double.image},
-                    "link" : ${this.state.static_double.link},
-                        "target_blank" : ${this.state.static_double.target_blank}
-                    }   
+        let objectToReturn = this.props.data;
+        let jsonCode = {
+            static_double_top:[
+                {
+                    text: this.state.static_double_top[0].text,
+                    image: this.state.static_double_top[0].image,
+                    link: this.state.static_double_top[0].link,
+                    target_blank: this.state.static_double_top.target_blank
+                },{
+                    text: this.state.static_double_top[1].text,
+                    image: this.state.static_double_top[1].image,
+                    link: this.state.static_double_top[1].link,
+                    target_blank: this.state.static_double_top.target_blank
+                },{
+                    text: this.state.static_double_top[2].text,
+                    image: this.state.static_double_top[2].image,
+                    link: this.state.static_double_top[2].link,
+                    target_blank: this.state.static_double_top.target_blank
                 }
-            }`
-        console.log(_.omit(this.state, ['lang', 'lang']))
+            ],
+            single: this.state.single,
+            double: this.state.double,
+            static_double: {
+                image: this.state.static_double.image,
+                link: this.state.static_double.link,
+                target_blank: this.state.static_double.target_blank
+            }   
+        }
+
+        objectToReturn[this.state.lang] = jsonCode;
+
+        this.updateHomepageData(objectToReturn)
     }
+
+    updateHomepageData(data) {
+        fetch('/tma_cms_apps/api/v1/microsite_manager/'+ window.props.siteID + '/homepage/', 
+            { 
+                credentials: "same-origin",
+                method: "PUT",
+                body: JSON.stringify(data),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': window.csrf
+                }
+            }
+        )
+        .then(response => response.json())
+        .then((json) => {
+            console.log('success')
+            this.setState({ hasValidated: true });
+        }); 
+    }
+
     /**
      * Gestion de l'annulation d'un champ en récuperant les information à travers les props
      */
-    handleCancel(){
-        this.setState(()=>{
-            return {
+    handleCancel() {
+        console.log(this.props.data)
+        this.setState({
                 static_double_top: [
                     { ...this.props.data[this.state.lang].static_double_top[0] },
                     { ...this.props.data[this.state.lang].static_double_top[1] },
@@ -111,9 +136,9 @@ class App extends React.Component {
                 single: [...this.props.data[this.state.lang].single],
                 double: this.props.data[this.state.lang].double,
                 static_double: { ...this.props.data[this.state.lang].static_double }
-            }
-        })
+            })
     }
+
     handleChangeLang (event,newValue){
         let language = '';
         if (newValue === 'en') {
@@ -134,7 +159,8 @@ class App extends React.Component {
             double: this.props.data[language].double,
             static_double: { ...this.props.data[language].static_double }
         })
-    };
+    }
+
     handleTargetBlank(keyId){
         if (keyId === "original") {
             let static_double = this.state.static_double
@@ -160,7 +186,7 @@ class App extends React.Component {
                 return { static_double_top }
             })
         }
-    };
+    }
     /**
      *Gestion de la mise à jour des champs et comparaison de state et props, vérification de chaque donnée entré par rapport aux données d'origine et changement de couleur  
      *
@@ -213,45 +239,57 @@ class App extends React.Component {
             }
         }
     }
+
     componentDidUpdate(prevProps,prevState,snapshot){
-        //Comparaison de state et de props
-        if (!_.isEqual(_.omit(this.state, ['lang']), this.props.data[this.state.lang])){
-            document.getElementById('cancel').style.display = "block"
-        }else{
-            document.getElementById('cancel').style.display = "none"
+        if (prevState.single.length > 0) {
+            //Comparaison de state et de props
+            if (!_.isEqual(_.omit(this.state, ['lang']), this.props.data[this.state.lang])){
+                document.getElementById('cancel').style.display = "block"
+            }else{
+                document.getElementById('cancel').style.display = "none"
+            }
         }
 
         this.hightlight(this.props.data[this.state.lang], _.omit(prevState, ['lang', 'lang']))
-
     }
-    render(){
-        //Rendu des composants des différents champs : 1-Tuile Simple 2-Tuile double rebond 3-Tuiles Double
-        return(
-            <div className="wrapper">
-                <div id='mainWrapper'>
-                    <Tabs
-                        value={this.state.lang}
-                        indicatorColor="primary"
-                        textColor="primary"
-                        onChange={this.handleChangeLang}
-                    >
-                        <Tab label="Fr" value={'fr'}/>
-                        <Tab label="En" value={'en'}/>
-                    </Tabs>
-                    {/* Fichier component.js */}
-                    <div id="tuileTop" >
-                        {<Component.StaticDouble handleTargetBlank={this.handleTargetBlank} handleChangeInput={this.handleChangeInput} keyId={1} static_double={this.state.static_double_top[0]} title="Tuile Top 1"/>}
-                        {<Component.StaticDouble handleTargetBlank={this.handleTargetBlank} handleChangeInput={this.handleChangeInput} keyId={2} static_double={this.state.static_double_top[1]} title="Tuile Top 2"/>}
-                        {<Component.StaticDouble handleTargetBlank={this.handleTargetBlank} handleChangeInput={this.handleChangeInput} keyId={3} static_double={this.state.static_double_top[2]} title="Tuile Top 3"/>}
+
+    componentDidMount() {
+        this.handleCancel();
+    }
+
+    render() {
+        return (
+            <div className="wrapper-hp">
+                {this.props.data &&
+                    <div id='mainWrapper'>
+                        <Tabs
+                            value={this.state.lang}
+                            indicatorColor="primary"
+                            textColor="primary"
+                            onChange={this.handleChangeLang}
+                        >
+                            <Tab label="Fr" value={'fr'}/>
+                            <Tab label="En" value={'en'}/>
+                        </Tabs>
+                        <div id="tuileTop" >
+                            {<Component.StaticDouble handleTargetBlank={this.handleTargetBlank} handleChangeInput={this.handleChangeInput} keyId={1} static_double={this.state.static_double_top[0]} title="Tuile Top 1" hasText={true}/> }
+                            {<Component.StaticDouble handleTargetBlank={this.handleTargetBlank} handleChangeInput={this.handleChangeInput} keyId={2} static_double={this.state.static_double_top[1]} title="Tuile Top 2" hasText={true}/>}
+                            {<Component.StaticDouble handleTargetBlank={this.handleTargetBlank} handleChangeInput={this.handleChangeInput} keyId={3} static_double={this.state.static_double_top[2]} title="Tuile Top 3" hasText={true}/>}
+                        </div>
+                        {<Component.InputMultipleTest handleChangeInput={this.handleChangeInput} single={this.state.single} />}
+                        {<Component.StaticDouble handleTargetBlank={this.handleTargetBlank} handleChangeInput={this.handleChangeInput} static_double={this.state.static_double} title="Tuile double rebond" hasText={false} />}
+                        {<Component.InputDouble handleChangeInput={this.handleChangeInput} double={this.state.double} />}
                     </div>
-                    {<Component.InputMultipleTest handleChangeInput={this.handleChangeInput} single={this.state.single} />}
-                    {<Component.StaticDouble handleTargetBlank={this.handleTargetBlank} handleChangeInput={this.handleChangeInput} static_double={this.state.static_double} title="Tuile double rebond" />}
-                    {<Component.InputDouble handleChangeInput={this.handleChangeInput} double={this.state.double} />}
-                </div>
-                <Sidebar handleSubmit={this.handleSubmit} handleCancel={this.handleCancel} handleInputLang={this.state.lang}/>{/* Fichier sidebar.js */}
+                }
+                <Sidebar 
+                    handleSubmit={this.handleSubmit}
+                    handleCancel={this.handleCancel}
+                    handleInputLang={this.state.lang}
+                    hasValidated={this.state.hasValidated}
+                />{/* Fichier sidebar.js */}
             </div>
         )
     }
 }
 
-export default App
+export default FrontPage

@@ -1,69 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import FrontPage from './app.js';
-import icon from './icon.png'; 
+import './index.css'; 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import { orange } from '@material-ui/core/colors';
 import "babel-polyfill";
+import FrontPage from './app.js';
 
-/**
- * Test Data
- */
-const data = {
-    "fr": {
-        "static_double_top": [
-            {
-                "image": "Image1",
-                "link": "Link1",
-                "target_blank": false
-            }, {
-                "image": "Image2",
-                "link": "Link2",
-                "target_blank": false
-            }, {
-                "image": "Image3",
-                "link": "Link3",
-                "target_blank": false
-            }
-        ],
-        "single": ['course_ID', 'course_ID', 'course_ID', 'course_ID', 'course_ID', 'course_ID', 'course_ID', 'course_ID'],
-        "double": 'course_ID',
-        "static_double": {
-            "image": 'Image',
-            "link": 'Link',
-            "target_blank": false
-        }
-    },
-    "en": {
-        "static_double_top": [
-            {
-                "image": "Image",
-                "link": "Link",
-                "target_blank": false
-            }, {
-                "image": "Image",
-                "link": "Link",
-                "target_blank": false
-            }, {
-                "image": "Image",
-                "link": "Link",
-                "target_blank": false
-            }
-        ],
-        "single": ['course_ID', 'course_ID', 'course_ID', 'course_ID', 'course_ID', 'course_ID', 'course_ID', 'course_ID'],
-        "double": "course_ID",
-        "static_double": {
-            "image": "Image",
-            "link": "Link",
-            "target_blank": false
-        }
-    }
-}
-
-export default data
 /**
  * Définition theme Material UI
  */
@@ -78,57 +22,49 @@ const theme = createMuiTheme({
     background: "#5cb7d8"
 });
 
-/**
- * Composant Header pour démonstration 
- */
-
-class Header extends React.Component {
+class App extends React.Component {
     constructor(props) {
         super(props);
-        this.handleHamMenu = this.handleHamMenu.bind(this)
-        this.handleCloseMenu = this.handleCloseMenu.bind(this)
+        this.fetchHomepageData = this.fetchHomepageData.bind(this);
+        this.state = {
+            data: null,
+            isLoaded: false
+        }
     }
-    handleHamMenu(e) {
-        let element = e.target;
-        element.previousSibling.style.right = "0%"
+
+    fetchHomepageData() {
+        let fetchedData = {};
+        fetch('/tma_cms_apps/api/v1/microsite_manager/'+ window.props.siteID +'/homepage/', 
+            { 
+                credentials: "same-origin",
+                method: "GET",
+            }
+        )
+        .then(response => response.json())
+        .then((json) => {
+            fetchedData = json;
+            this.setState({data: fetchedData, isLoaded: true})
+        }); 
     }
-    handleCloseMenu(e) {
-        let element = e.target;
-        element.parentElement.style.right = "-45%"
+
+    componentDidMount() {
+        this.fetchHomepageData();
     }
+
     render() {
         return (
-            <div className="header">
-                <div className="headWrapper">
-                    <a className="logo" href="/">
-                        <h1>
-                            <img src={icon} alt="Phileas" />
-                        </h1>
-                    </a>
-                    <div className="rightSection">
-                        <a className="explore" href="/">
-                            Explorer
-                        </a>
-                        <div className="closeMenu" onClick={e => { this.handleCloseMenu(e) }}></div>
-                    </div>
-                    <div className="hamButton" onClick={e => { this.handleHamMenu(e) }}></div>
-                </div>
+            <div>
+                <h1 className="title">Administration</h1>
+                {this.state.isLoaded && <FrontPage data={this.state.data}/>}
             </div>
-        );
+        )
     }
-}
-
-
-/**
- * Rendu 
- */
+};
 
 ReactDOM.render(
     <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Header />
-            <h1 className="title">Administration</h1>
-         <FrontPage data={data} />}
+        <App />
     </ThemeProvider>
 
     ,

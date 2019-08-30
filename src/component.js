@@ -11,17 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import Fab from '@material-ui/core/Fab';
 import Checkbox from '@material-ui/core/Checkbox';
 
-/**
- * Composants d'affichage des différentes section de la page et Highlight sur la sidebar (/!\ Sortir la logique d'highlight de la sidebar de ces composants -- SoC)
- * InputMultipleTest : Tuile Simple
- * InputStaticDouble : Tuile Double Rebond
- * InputDouble : Tuile Double
- */
 
- 
- /**
-  * Composant Tuile Simple 
-  */
 function InputMultipleTest(props){
     //Affichage des différents champs par nombre d'élèments dans le tableau des données "Single"
     return (
@@ -32,14 +22,14 @@ function InputMultipleTest(props){
                 {
                 props.single.map((field, index) => {
                     return (
-                        <TextField className="fieldSingle" key={index} fullWidth onChange={(e) => {
-                            props.handleChangeInput(e, index)
-                        }} label={"Course_id: " + parseInt(index + 1)} onFocus={()=>{
-                            document.getElementsByClassName('simpleTulletIcon')[index].style.backgroundColor = "rgb(92, 183, 216)"
-                        }} onBlur={(e)=>{
-                            document.getElementsByClassName('simpleTulletIcon')[index].style.backgroundColor = ""
-                        }
-                        } value={field}></TextField>
+                        <TextField 
+                            className="fieldSingle" key={index} fullWidth
+                            onChange={(e) => { props.handleChangeInput(e, index)}}
+                            label={"Course_id: " + parseInt(index + 1)}
+                            onFocus={()=>{document.getElementsByClassName('simpleTulletIcon')[index].style.backgroundColor = "rgb(92, 183, 216)"}}
+                            onBlur={(e)=>{document.getElementsByClassName('simpleTulletIcon')[index].style.backgroundColor = ""}} 
+                            value={field}>
+                        </TextField>
                     )
                 })
                 }
@@ -48,10 +38,6 @@ function InputMultipleTest(props){
         </div>
     )
 }
-
-/**
- * Composant Tuile Double Rebond
- */
 
 function InputStaticDouble(props) {
     //Gestion de l'affichage "preview" dans une popin
@@ -78,14 +64,38 @@ function InputStaticDouble(props) {
                 <h2>{props.title}</h2>
                 <Card>
                     <CardContent>
-                        <TextField fullWidth className={idOfTullet + ' fieldTuileDoubleRebond'} keyid={props.keyId} onChange={(e) => {
-                                props.handleChangeInput(e, false, "image")
-                            }} onFocus={() => {
-                                document.getElementsByClassName(highlightHelper)[0].style.backgroundColor = "rgb(92, 183, 216)"
-                            }} onBlur={(e) => {
-                                document.getElementsByClassName(highlightHelper)[0].style.backgroundColor = ""
+                        {props.hasText &&
+                            <TextField 
+                                fullWidth
+                                className={idOfTullet + ' fieldTuileDoubleRebond'}
+                                keyid={props.keyId}
+                                onChange={(e) => {
+                                        props.handleChangeInput(e, false, "text")
+                                    }} onFocus={() => {
+                                        document.getElementsByClassName(highlightHelper)[0].style.backgroundColor = "rgb(92, 183, 216)"
+                                    }} onBlur={(e) => {
+                                        document.getElementsByClassName(highlightHelper)[0].style.backgroundColor = ""
+                                    }
+                                    }
+                                label="Text"
+                                value={props.static_double ? props.static_double.text : ""}
+                            ></TextField>
+                        }
+
+                        <TextField 
+                            fullWidth
+                            className={idOfTullet + ' fieldTuileDoubleRebond'}
+                            keyid={props.keyId}
+                            onChange={(e) => {
+                                    props.handleChangeInput(e, false, "image")
+                                }} onFocus={() => {
+                                    document.getElementsByClassName(highlightHelper)[0].style.backgroundColor = "rgb(92, 183, 216)"
+                                }} onBlur={(e) => {
+                                    document.getElementsByClassName(highlightHelper)[0].style.backgroundColor = ""
+                                }
                             }
-                            } label="Image" value={props.static_double.image}
+                            label={(props.title.indexOf('Top') > -1) ? "Image 600*318px" : "Image 621*397px"}
+                            value={props.static_double ? props.static_double.image : ""}
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment  position="end">
@@ -98,8 +108,7 @@ function InputStaticDouble(props) {
                                         </IconButton>
                                     </InputAdornment>
                                 ),
-                            }}
-                            
+                            }}  
                         ></TextField>
                         <Modal
                             aria-labelledby="simple-modal-title"
@@ -116,7 +125,7 @@ function InputStaticDouble(props) {
                                 style={{ minHeight: '100vh', maxHeight: '100%',overflow : 'auto' }}
                         >
                                 <Grid className="displayPreviewImage" item sm={9} xs={10}>
-                                    <img src={props.static_double.image} alt={props.static_double.image} />
+                                    <img src={props.static_double ? props.static_double.image : ''} alt={props.static_double ? props.static_double.image : ""} />
                                     <div className='closeButton'>
                                         <Fab color='secondary' onClick={handleClose} size="small" className='fabWrapperCloseButton'>
                                             <Close  className="closeColor"/>    
@@ -127,19 +136,26 @@ function InputStaticDouble(props) {
                             </Grid> 
                         </Modal>
 
-                        <TextField fullWidth className={idOfTullet + ' fieldTuileDoubleRebond'} keyid={props.keyId} onChange={(e) => {
-                            props.handleChangeInput(e, false, "link")
-                        }} onFocus={() => {
-                            document.getElementsByClassName(highlightHelper)[0].style.backgroundColor = "rgb(92, 183, 216)"
-                        }} onBlur={(e) => {
-                            document.getElementsByClassName(highlightHelper)[0].style.backgroundColor = ""
-                        }
-                        } label="Lien" onClick={handleClose} value={props.static_double.link}
+                        <TextField
+                            fullWidth
+                            className={idOfTullet + ' fieldTuileDoubleRebond'}
+                            keyid={props.keyId}
+                            onChange={(e) => {
+                                    props.handleChangeInput(e, false, "link")
+                                }} onFocus={() => {
+                                    document.getElementsByClassName(highlightHelper)[0].style.backgroundColor = "rgb(92, 183, 216)"
+                                }} onBlur={(e) => {
+                                    document.getElementsByClassName(highlightHelper)[0].style.backgroundColor = ""
+                                }
+                                }
+                            label="Lien"
+                            onClick={handleClose}
+                            value={props.static_double ? props.static_double.link : ''}
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
                                         <Checkbox
-                                            checked={props.static_double.target_blank}
+                                            checked={props.static_double ? props.static_double.target_blank : ''}
                                             onChange={() => { props.handleTargetBlank(keyId) }}
                                             value="target_blank"
                                             inputProps={{
@@ -149,7 +165,7 @@ function InputStaticDouble(props) {
 
                                     </InputAdornment>
                                 ),
-                            }}
+                        }}
                         ></TextField>
 
                     </CardContent>
@@ -158,10 +174,6 @@ function InputStaticDouble(props) {
         )
 }
 
-
-/**
- * Composant Tuile Double
- */
 function InputDouble(props){
     //Affichage du champ
     return (
@@ -176,13 +188,12 @@ function InputDouble(props){
                     }} onBlur={(e) => {
                         document.getElementsByClassName('doublesimpleTulletIcon')[0].style.backgroundColor = ""
                     }
-                        } label="Course_id: 9" value={props.double}></TextField>
+                        } label="Course_id: 9" value={props.double ? props.double : ""}></TextField>
                 </CardContent>
             </Card>
         </div>
     )
 }
-
 
 
 export default {
