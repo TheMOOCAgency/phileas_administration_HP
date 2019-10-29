@@ -22,12 +22,12 @@ function InputMultipleTest(props){
                 {
                 props.single.map((field, index) => {
                     return (
-                        <TextField 
+                        <TextField
                             className="fieldSingle" key={index} fullWidth
                             onChange={(e) => { props.handleChangeInput(e, index)}}
                             label={"Course_id: " + parseInt(index + 1)}
                             onFocus={()=>{document.getElementsByClassName('simpleTulletIcon')[index].style.backgroundColor = "rgb(92, 183, 216)"}}
-                            onBlur={(e)=>{document.getElementsByClassName('simpleTulletIcon')[index].style.backgroundColor = ""}} 
+                            onBlur={(e)=>{document.getElementsByClassName('simpleTulletIcon')[index].style.backgroundColor = ""}}
                             value={field}>
                         </TextField>
                     )
@@ -42,20 +42,20 @@ function InputMultipleTest(props){
 function InputStaticDouble(props) {
     //Gestion de l'affichage "preview" dans une popin
     const [open, setOpen] = React.useState(false);
-    let idOfTullet = 'tuileDoubleRebondOri'; 
-    let highlightHelper = 'doubleRebondTulletIcon'; 
-    let keyId = props.keyId;
+    let idOfTullet = 'tuileDoubleRebondOri';
+    let highlightHelper = 'doubleRebondTulletIcon';
+    let keyId = '';
     const handleClose = () => {
         setOpen(false);
     };
-
     const handleOpen = () => {
         setOpen(true);
     };
     //Affichage des deux champs : Image - Link
     if (props.keyId){
+        keyId = props.keyId
         idOfTullet = 'tuileDoubleRebond' + props.keyId
-        highlightHelper = 'doubleRebondTulletIcon' + props.keyId; 
+        highlightHelper = 'doubleRebondTulletIcon' + props.keyId;
     }else{
         keyId = 'original'
     }
@@ -65,10 +65,10 @@ function InputStaticDouble(props) {
                 <Card>
                     <CardContent>
                         {props.hasText &&
-                            <TextField 
+                            <TextField
                                 fullWidth
                                 className={idOfTullet + ' fieldTuileDoubleRebond'}
-                                keyid={props.keyId}
+                                keyid={keyId}
                                 onChange={(e) => {
                                         props.handleChangeInput(e, false, "text")
                                     }} onFocus={() => {
@@ -82,10 +82,10 @@ function InputStaticDouble(props) {
                             ></TextField>
                         }
 
-                        <TextField 
+                        <TextField
                             fullWidth
                             className={idOfTullet + ' fieldTuileDoubleRebond'}
-                            keyid={props.keyId}
+                            keyid={keyId}
                             onChange={(e) => {
                                     props.handleChangeInput(e, false, "image")
                                 }} onFocus={() => {
@@ -108,7 +108,7 @@ function InputStaticDouble(props) {
                                         </IconButton>
                                     </InputAdornment>
                                 ),
-                            }}  
+                            }}
                         ></TextField>
                         <Modal
                             aria-labelledby="simple-modal-title"
@@ -128,14 +128,13 @@ function InputStaticDouble(props) {
                                     <img src={props.static_double ? props.static_double.image : ''} alt={props.static_double ? props.static_double.image : ""} />
                                     <div className='closeButton'>
                                         <Fab color='secondary' onClick={handleClose} size="small" className='fabWrapperCloseButton'>
-                                            <Close  className="closeColor"/>    
+                                            <Close  className="closeColor"/>
                                         </Fab>
                                     </div>
                                 </Grid>
-                               
-                            </Grid> 
-                        </Modal>
 
+                            </Grid>
+                        </Modal>
                         <TextField
                             fullWidth
                             className={idOfTullet + ' fieldTuileDoubleRebond'}
@@ -155,7 +154,7 @@ function InputStaticDouble(props) {
                                 endAdornment: (
                                     <InputAdornment position="end">
                                         <Checkbox
-                                            checked={props.static_double ? props.static_double.target_blank : ''}
+                                            checked={props.static_double ? props.static_double.target_blank : false}
                                             onChange={() => { props.handleTargetBlank(keyId) }}
                                             value="target_blank"
                                             inputProps={{

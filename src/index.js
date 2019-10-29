@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css'; 
+import './index.css';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
@@ -34,8 +34,8 @@ class App extends React.Component {
 
     fetchHomepageData() {
         let fetchedData = {};
-        fetch('/tma_cms_apps/api/v1/microsite_manager/'+ window.props.siteID +'/homepage/', 
-            { 
+        fetch('/tma_cms_apps/api/v1/microsite_manager/'+ window.props.siteID +'/homepage/',
+            {
                 credentials: "same-origin",
                 method: "GET",
             }
@@ -44,7 +44,7 @@ class App extends React.Component {
         .then((json) => {
             fetchedData = json;
             this.setState({data: fetchedData, isLoaded: true})
-        }); 
+        });
     }
 
     componentDidMount() {
@@ -54,7 +54,7 @@ class App extends React.Component {
     render() {
         return (
             <div>
-                <h1 className="title">Administration</h1>
+                <h1 className="title">Administration<a id="manageImage" href="https://studio-new.phileasamundi.com/assets/course-v1:global+000+2019/">Manage images</a></h1>
                 {this.state.isLoaded && <FrontPage data={this.state.data}/>}
             </div>
         )

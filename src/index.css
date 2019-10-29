@@ -95,7 +95,15 @@
     width: 70%;
     margin: 0 auto;
 }
-
+#manageImage{
+  float : right;
+  text-decoration: none;
+  color : rgb(102, 102, 102)
+}
+#manageImage:hover{
+  color: #0075b4;
+  text-decoration: none;
+}
 #mainWrapper {
     display: flex;
     flex-direction: column;

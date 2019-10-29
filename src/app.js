@@ -29,9 +29,9 @@ class FrontPage extends React.Component {
     }
     /**
      * Gestion des entrés dans les champs
-     * @param {element cible, objet HTML e.target lors d'un event 'change'} e 
-     * @param {*Gestion de l'index des tuiles simples} i 
-     * @param {*Définition du type (image ou link) pour les champs tuiles doubles} type 
+     * @param {element cible, objet HTML e.target lors d'un event 'change'} e
+     * @param {*Gestion de l'index des tuiles simples} i
+     * @param {*Définition du type (image ou link) pour les champs tuiles doubles} type
      */
     handleChangeInput(e, i, type) {
         if (i || i === 0) {
@@ -69,23 +69,35 @@ class FrontPage extends React.Component {
      */
     handleSubmit(){
         let objectToReturn = this.props.data;
+        var targetBlankToSend0 = false;
+        var targetBlankToSend1 = false;
+        var targetBlankToSend2 = false;
+        if(typeof this.state.static_double_top[0].target_blank !== 'undefined'){
+          targetBlankToSend0 = this.state.static_double_top[0].target_blank
+        }
+        if(typeof !this.state.static_double_top[1].target_blank !== 'undefined'){
+          targetBlankToSend1 = this.state.static_double_top[1].target_blank
+        }
+        if(typeof !this.state.static_double_top[2].target_blank !== 'undefined'){
+          targetBlankToSend2 = this.state.static_double_top[2].target_blank
+        }
         let jsonCode = {
             static_double_top:[
                 {
                     text: this.state.static_double_top[0].text,
                     image: this.state.static_double_top[0].image,
                     link: this.state.static_double_top[0].link,
-                    target_blank: this.state.static_double_top.target_blank
+                    target_blank: targetBlankToSend0
                 },{
                     text: this.state.static_double_top[1].text,
                     image: this.state.static_double_top[1].image,
                     link: this.state.static_double_top[1].link,
-                    target_blank: this.state.static_double_top.target_blank
+                    target_blank: targetBlankToSend1
                 },{
                     text: this.state.static_double_top[2].text,
                     image: this.state.static_double_top[2].image,
                     link: this.state.static_double_top[2].link,
-                    target_blank: this.state.static_double_top.target_blank
+                    target_blank: targetBlankToSend2
                 }
             ],
             single: this.state.single,
@@ -94,17 +106,16 @@ class FrontPage extends React.Component {
                 image: this.state.static_double.image,
                 link: this.state.static_double.link,
                 target_blank: this.state.static_double.target_blank
-            }   
+            }
         }
 
         objectToReturn[this.state.lang] = jsonCode;
-
         this.updateHomepageData(objectToReturn)
     }
 
     updateHomepageData(data) {
-        fetch('/tma_cms_apps/api/v1/microsite_manager/'+ window.props.siteID + '/homepage/', 
-            { 
+        fetch('/tma_cms_apps/api/v1/microsite_manager/'+ window.props.siteID + '/homepage/',
+            {
                 credentials: "same-origin",
                 method: "PUT",
                 body: JSON.stringify(data),
@@ -119,14 +130,13 @@ class FrontPage extends React.Component {
         .then((json) => {
             console.log('success')
             this.setState({ hasValidated: true });
-        }); 
+        });
     }
 
     /**
      * Gestion de l'annulation d'un champ en récuperant les information à travers les props
      */
     handleCancel() {
-        console.log(this.props.data)
         this.setState({
                 static_double_top: [
                     { ...this.props.data[this.state.lang].static_double_top[0] },
@@ -174,7 +184,7 @@ class FrontPage extends React.Component {
                 return { static_double }
             })
         }else{
-            
+
             let static_double_top = this.state.static_double_top
             this.setState(prevState => {
                 Object.assign({}, prevState.static_double_top[keyId - 1]);
@@ -188,7 +198,7 @@ class FrontPage extends React.Component {
         }
     }
     /**
-     *Gestion de la mise à jour des champs et comparaison de state et props, vérification de chaque donnée entré par rapport aux données d'origine et changement de couleur  
+     *Gestion de la mise à jour des champs et comparaison de state et props, vérification de chaque donnée entré par rapport aux données d'origine et changement de couleur
      *
      */
 
@@ -226,16 +236,20 @@ class FrontPage extends React.Component {
         }
 
         for (var property in this.state.static_double_top) {
-            if (this.state.static_double_top[property].image !== this.props.data[this.state.lang].static_double_top[property].image) {
+            if (this.state.static_double_top[property].text !== this.props.data[this.state.lang].static_double_top[property].text) {
                 document.getElementById('tuileTop').getElementsByClassName('tuileDoubleRebond')[property].getElementsByTagName('input')[0].style.color = 'orange'
             } else {
                 document.getElementById('tuileTop').getElementsByClassName('tuileDoubleRebond')[property].getElementsByTagName('input')[0].style.color = ''
             }
-
-            if (this.state.static_double_top[property].link !== this.props.data[this.state.lang].static_double_top[property].link) {
+            if (this.state.static_double_top[property].image !== this.props.data[this.state.lang].static_double_top[property].image) {
                 document.getElementById('tuileTop').getElementsByClassName('tuileDoubleRebond')[property].getElementsByTagName('input')[1].style.color = 'orange'
             } else {
                 document.getElementById('tuileTop').getElementsByClassName('tuileDoubleRebond')[property].getElementsByTagName('input')[1].style.color = ''
+            }
+            if (this.state.static_double_top[property].link !== this.props.data[this.state.lang].static_double_top[property].link) {
+                document.getElementById('tuileTop').getElementsByClassName('tuileDoubleRebond')[property].getElementsByTagName('input')[2].style.color = 'orange'
+            } else {
+                document.getElementById('tuileTop').getElementsByClassName('tuileDoubleRebond')[property].getElementsByTagName('input')[2].style.color = ''
             }
         }
     }
@@ -260,7 +274,7 @@ class FrontPage extends React.Component {
     render() {
         return (
             <div className="wrapper-hp">
-                {this.props.data &&
+                {this.props.data && this.state.static_double_top.length > 1 &&
                     <div id='mainWrapper'>
                         <Tabs
                             value={this.state.lang}
@@ -281,7 +295,7 @@ class FrontPage extends React.Component {
                         {<Component.InputDouble handleChangeInput={this.handleChangeInput} double={this.state.double} />}
                     </div>
                 }
-                <Sidebar 
+                <Sidebar
                     handleSubmit={this.handleSubmit}
                     handleCancel={this.handleCancel}
                     handleInputLang={this.state.lang}
